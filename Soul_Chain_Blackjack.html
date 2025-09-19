@@ -1,0 +1,727 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Blockchain Blackjack - The Ritual of Wager</title>
+
+  <style>
+    body {
+      font-family: sans-serif;
+      background: #0f172a;
+      color: #fff;
+      margin: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    
+    .header {
+      width: 100%;
+      background: #1e293b;
+      padding: 1em 0;
+      text-align: center;
+      border-bottom: 2px solid #334155;
+      margin-bottom: 2em;
+    }
+    
+    .header h1 {
+      margin: 0;
+      color: #38bdf8;
+      font-size: 2em;
+    }
+    
+    .header .subtitle {
+      color: #94a3b8;
+      margin-top: 0.5em;
+    }
+    
+    .main-container {
+      display: flex;
+      gap: 2em;
+      max-width: 1200px;
+      width: 100%;
+      padding: 0 1em;
+      flex-wrap: wrap;
+    }
+    
+    .game-section {
+      flex: 2;
+      max-width: 500px;
+    }
+    
+    .blockchain-section {
+      flex: 1;
+      min-width: 300px;
+    }
+    
+    .container {
+      background: #1e293b;
+      border-radius: 1em;
+      box-shadow: 0 0 24px #0007;
+      transition: box-shadow 0.3s ease;
+      padding: 2em;
+      margin-bottom: 2em;
+    }
+    
+    .container.listening {
+      box-shadow: 0 0 24px #3b82f6;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0% { box-shadow: 0 0 24px #3b82f6; }
+      50% { box-shadow: 0 0 36px #60a5fa; }
+      100% { box-shadow: 0 0 24px #3b82f6; }
+    }
+    
+    .msg {
+      background: #334155;
+      padding: 1em;
+      border-radius: 0.5em;
+      margin-bottom: 1em;
+      font-size: 1.1em;
+      min-height: 3em;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    .status {
+      background: #065f46;
+      color: #10b981;
+      padding: 0.5em 1em;
+      border-radius: 0.5em;
+      margin-bottom: 1em;
+      font-size: 0.9em;
+    }
+    
+    .error {
+      background: #7f1d1d;
+      color: #f87171;
+      padding: 0.5em 1em;
+      border-radius: 0.5em;
+      margin-bottom: 1em;
+      font-size: 0.9em;
+    }
+    
+    .click-prompt {
+      background: #1e40af;
+      color: #93c5fd;
+      padding: 1em;
+      border-radius: 0.5em;
+      margin-bottom: 1em;
+      cursor: pointer;
+      transition: background 0.3s ease;
+      text-align: center;
+    }
+    
+    .click-prompt:hover {
+      background: #1d4ed8;
+    }
+    
+    .instructions {
+      color: #9ca3af;
+      font-size: 0.9em;
+      line-height: 1.4;
+    }
+    
+    .balance-panel {
+      background: linear-gradient(135deg, #059669 0%, #047857 100%);
+      padding: 1.5em;
+      border-radius: 0.5em;
+      margin-bottom: 1em;
+    }
+    
+    .balance-title {
+      font-size: 1.2em;
+      font-weight: bold;
+      margin-bottom: 1em;
+      text-align: center;
+    }
+    
+    .balance-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.5em;
+      border-bottom: 1px solid #047857;
+    }
+    
+    .balance-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+    
+    .praise-feed {
+        background: #1e293b;
+        padding: 1em;
+        border-radius: 0.5em;
+        max-height: 250px;
+        overflow-y: scroll;
+    }
+    
+    .praise-feed h3 {
+      margin-top: 0;
+    }
+    
+    .praise-item {
+      padding: 0.5em;
+      margin-bottom: 0.5em;
+      background: #334155;
+      border-radius: 0.25em;
+      font-size: 0.9em;
+      border-left: 3px solid #06b6d4;
+    }
+    
+    .network-stats {
+      color: #9ca3af;
+    }
+    
+    .network-stats h3 {
+      margin-top: 0;
+      color: #fff;
+    }
+    
+    .stat-item {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.5em;
+      border-bottom: 1px solid #334155;
+    }
+    
+    .stat-item:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+    }
+    
+    @media (max-width: 768px) {
+      .main-container {
+        flex-direction: column;
+      }
+      
+      .header h1 {
+        font-size: 1.5em;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="header">
+    <h1>♠️ Blockchain Blackjack</h1>
+    <div class="subtitle">The Ritual of Wager • Dignity, Generosity, Inclusion</div>
+  </div>
+
+  <div class="main-container">
+    <div class="game-section">
+      <div class="container" id="game-container">
+        <div id="status-area"></div>
+        
+        <div id="msg" class="msg" aria-live="polite">
+          Welcome to the Soul Chain. Say 'bet [amount]' to start a game.
+        </div>
+        
+        <div id="click-prompt" class="click-prompt">
+          🎤 Click here to activate voice commands
+        </div>
+        
+        <div class="instructions">
+          <strong>Voice commands:</strong><br>
+          • "bet [amount]" - Example: "bet 50"<br>
+          • "hit" - Take another card<br>
+          • "stand" - End your turn<br>
+          • "what's my hand?" - Hear your hand<br>
+          • "what's the dealer's hand?" - Hear the dealer's visible card<br>
+          • "new game" - Start a new game
+        </div>
+      </div>
+    </div>
+
+    <div class="blockchain-section">
+      <div class="container">
+        <div class="balance-panel">
+          <div class="balance-title">💰 My Balance</div>
+          <div class="balance-item">
+            <span>Current Balance:</span>
+            <span id="player-balance">1000</span>
+          </div>
+          <div class="balance-item">
+            <span>Current Bet:</span>
+            <span id="current-bet">0</span>
+          </div>
+          <div class="balance-item">
+            <span>Games Played:</span>
+            <span id="games-played">0</span>
+          </div>
+          <div class="balance-item">
+            <span>Coins Won/Lost:</span>
+            <span id="net-coins">0</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="container">
+        <div class="praise-feed">
+            <h3>🕊️ Praise Feed</h3>
+            <div id="praise-feed-content">
+                <div class="praise-item">@SoulWeaver started a new ritual with a 100 coin wager.</div>
+                <div class="praise-item">@LedgerGuardian won 50 coins. A transparent win.</div>
+            </div>
+        </div>
+      </div>
+
+      <div class="container">
+        <div class="network-stats">
+          <h3>🌐 Soul Chain Status</h3>
+          <div class="stat-item">
+            <span>Active Players:</span>
+            <span id="active-players">2,847</span>
+          </div>
+          <div class="stat-item">
+            <span>Global Transactions/min:</span>
+            <span id="tx-per-min">156</span>
+          </div>
+          <div class="stat-item">
+            <span>Network Security:</span>
+            <span style="color: #10b981;">Excellent</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const msgEl = document.getElementById('msg');
+      const container = document.getElementById('game-container');
+      const statusArea = document.getElementById('status-area');
+      const clickPrompt = document.getElementById('click-prompt');
+      const praiseFeedContent = document.getElementById('praise-feed-content');
+      
+      // Game state
+      let game = null;
+      let isListening = false;
+      let playerState = {
+        coins: 1000,
+        gamesPlayed: 0,
+        netCoins: 0,
+        currentBet: 0
+      };
+
+      // Simulated users for praise feed
+      const users = ["@SoulWeaver", "@ChainBuilder", "@LedgerGuardian", "@RitualPatron", "@BlindPhoenix"];
+
+      // Speech recognition setup
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      const recognition = SpeechRecognition ? new SpeechRecognition() : null;
+
+      // Card definitions
+      const cardNames = {
+        'A': 'Ace', 'J': 'Jack', 'Q': 'Queen', 'K': 'King'
+      };
+      const suits = ['Hearts', 'Diamonds', 'Clubs', 'Spades'];
+      const ranks = ['A', '2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K'];
+
+      // UI Update functions
+      const updateUI = () => {
+        document.getElementById('player-balance').textContent = playerState.coins;
+        document.getElementById('current-bet').textContent = playerState.currentBet;
+        document.getElementById('games-played').textContent = playerState.gamesPlayed;
+        document.getElementById('net-coins').textContent = playerState.netCoins;
+      };
+
+      const showStatus = (text, type = 'status') => {
+        statusArea.innerHTML = `<div class="${type}">${text}</div>`;
+        setTimeout(() => statusArea.innerHTML = '', 3000);
+      };
+
+      const updateMessage = (text) => {
+        msgEl.textContent = text;
+      };
+
+      const speak = (text, callback) => {
+        // Check if speech synthesis is available
+        if (window.speechSynthesis) {
+          window.speechSynthesis.cancel();
+          const utterance = new SpeechSynthesisUtterance(text);
+          utterance.rate = 0.9;
+          utterance.pitch = 1;
+          utterance.volume = 0.8;
+          
+          utterance.onend = () => {
+            if (callback) callback();
+          };
+          
+          utterance.onerror = () => {
+            console.log('Speech synthesis error, continuing silently');
+            if (callback) callback();
+          };
+          
+          window.speechSynthesis.speak(utterance);
+        }
+        updateMessage(text);
+      };
+
+      const addPraise = (text) => {
+          const praiseItem = document.createElement('div');
+          praiseItem.className = 'praise-item';
+          praiseItem.textContent = text;
+          praiseFeedContent.prepend(praiseItem);
+          if (praiseFeedContent.children.length > 10) {
+              praiseFeedContent.removeChild(praiseFeedContent.lastElementChild);
+          }
+      };
+
+      // Blackjack game logic
+      class BlackjackGame {
+        constructor() {
+          this.deck = this.createDeck();
+          this.playerHand = [];
+          this.dealerHand = [];
+          this.isGameActive = false;
+        }
+
+        createDeck() {
+          let deck = [];
+          for (let suit of suits) {
+            for (let rank of ranks) {
+              deck.push({ rank, suit });
+            }
+          }
+          // Shuffle
+          for (let i = deck.length - 1; i > 0; i--) {
+            const j = Math.floor(Math.random() * (i + 1));
+            [deck[i], deck[j]] = [deck[j], deck[i]];
+          }
+          return deck;
+        }
+
+        dealCard() {
+          if (this.deck.length === 0) {
+            this.deck = this.createDeck(); // Reshuffle if deck is empty
+          }
+          return this.deck.pop();
+        }
+
+        getHandValue(hand) {
+          let value = 0;
+          let aces = 0;
+          for (let card of hand) {
+            if (card.rank === 'A') {
+              aces++;
+              value += 11;
+            } else if (['J', 'Q', 'K'].includes(card.rank)) {
+              value += 10;
+            } else {
+              value += parseInt(card.rank);
+            }
+          }
+          // Correctly handle Aces if the hand busts
+          while (value > 21 && aces > 0) {
+            value -= 10;
+            aces--;
+          }
+          return value;
+        }
+
+        describeCard(card) {
+          const rank = cardNames[card.rank] || card.rank;
+          return `${rank} of ${card.suit}`;
+        }
+
+        describeHand(hand, isPlayer = true) {
+          const handName = isPlayer ? "your hand" : "the dealer's hand";
+          const cardsText = hand.map(card => this.describeCard(card)).join(', and ');
+          const value = this.getHandValue(hand);
+          return `In ${handName}, you have the ${cardsText}, for a total of ${value}.`;
+        }
+        
+        describeDealerVisibleCard() {
+          const visibleCard = this.dealerHand[0];
+          return `The dealer shows the ${this.describeCard(visibleCard)}.`;
+        }
+
+        startGame() {
+          if (playerState.currentBet === 0) {
+            speak("You must place a bet before starting. Say 'bet [amount]' to begin.");
+            return;
+          }
+          if (playerState.currentBet > playerState.coins) {
+            speak("You don't have enough coins for that bet.");
+            return;
+          }
+          
+          this.playerHand = [this.dealCard(), this.dealCard()];
+          this.dealerHand = [this.dealCard(), this.dealCard()];
+          this.isGameActive = true;
+          playerState.gamesPlayed++;
+          updateUI();
+          
+          const playerValue = this.getHandValue(this.playerHand);
+          
+          // Check for blackjack
+          if (playerValue === 21) {
+            speak(`Blackjack! ${this.describeHand(this.playerHand)} You win!`);
+            this.endGame('blackjack');
+            return;
+          }
+          
+          speak(`Game started. ${this.describeHand(this.playerHand)}. ${this.describeDealerVisibleCard()} Say 'hit' or 'stand'.`);
+          addPraise(`${users[Math.floor(Math.random() * users.length)]} started a new ritual with a ${playerState.currentBet} coin wager.`);
+        }
+        
+        hit() {
+          if (!this.isGameActive) {
+            speak("Please start a game first by placing a bet.");
+            return;
+          }
+          this.playerHand.push(this.dealCard());
+          const playerValue = this.getHandValue(this.playerHand);
+          speak(`You hit. You drew the ${this.describeCard(this.playerHand[this.playerHand.length - 1])}. Your total is ${playerValue}.`);
+          
+          if (playerValue > 21) {
+            speak("You busted! The dealer wins. Say 'new game' to start again.");
+            this.endGame('loss');
+          }
+        }
+
+        stand() {
+          if (!this.isGameActive) {
+            speak("No active game. Say 'bet [amount]' to start.");
+            return;
+          }
+          
+          speak("You stand. Now it's the dealer's turn.");
+          
+          const dealerPlay = () => {
+            const dealerValue = this.getHandValue(this.dealerHand);
+            if (dealerValue < 17) {
+              this.dealerHand.push(this.dealCard());
+              const newCard = this.dealerHand[this.dealerHand.length - 1];
+              speak(`The dealer hits and draws the ${this.describeCard(newCard)}. Their total is now ${this.getHandValue(this.dealerHand)}.`);
+              setTimeout(dealerPlay, 2000);
+            } else {
+              this.endGame('evaluate');
+            }
+          };
+
+          setTimeout(() => {
+            speak(`The dealer reveals their hidden card. ${this.describeHand(this.dealerHand, false)}`);
+            setTimeout(dealerPlay, 2000);
+          }, 2000);
+        }
+        
+        endGame(result) {
+          if (!this.isGameActive && result !== 'blackjack' && result !== 'loss') {
+            return; // Prevent multiple calls
+          }
+          
+          this.isGameActive = false;
+          let message = "";
+          let coinsWon = 0;
+          
+          if (result === 'blackjack') {
+            coinsWon = Math.floor(playerState.currentBet * 1.5);
+            message = `Blackjack! You win ${coinsWon} coins! A perfect ritual!`;
+            showStatus("🔗 Transaction recorded: Blackjack Win");
+          } else if (result === 'loss') {
+            coinsWon = -playerState.currentBet;
+            message = `You lost ${playerState.currentBet} coins. Your ritual has been logged.`;
+            showStatus("🔗 Transaction recorded: Loss");
+          } else if (result === 'evaluate') {
+            const playerValue = this.getHandValue(this.playerHand);
+            const dealerValue = this.getHandValue(this.dealerHand);
+            
+            if (dealerValue > 21) {
+              coinsWon = playerState.currentBet;
+              message = `The dealer busted! You win ${coinsWon} coins! A righteous ritual!`;
+              showStatus("🔗 Transaction recorded: Win");
+            } else if (playerValue > dealerValue) {
+              coinsWon = playerState.currentBet;
+              message = `You win! You beat the dealer ${playerValue} to ${dealerValue}. You have been awarded ${coinsWon} coins.`;
+              showStatus("🔗 Transaction recorded: Win");
+            } else if (playerValue < dealerValue) {
+              coinsWon = -playerState.currentBet;
+              message = `You lost. The dealer wins ${dealerValue} to ${playerValue}. Your ritual has been logged.`;
+              showStatus("🔗 Transaction recorded: Loss");
+            } else {
+              coinsWon = 0;
+              message = "It's a push! Your bet is returned. The ritual continues.";
+              showStatus("🔗 Transaction recorded: Push");
+            }
+          }
+          
+          playerState.coins += coinsWon;
+          playerState.netCoins += coinsWon;
+          playerState.currentBet = 0;
+          updateUI();
+          speak(message + " Say 'new game' to continue.");
+          addPraise(`${users[Math.floor(Math.random() * users.length)]} completed a ritual with ${coinsWon >= 0 ? 'a gain' : 'a loss'} of ${Math.abs(coinsWon)} coins.`);
+        }
+      }
+
+      // Command handling
+      const handleCommand = (command) => {
+        if (!command || command.trim() === '') {
+          speak("Please speak a clear command.");
+          return;
+        }
+
+        const cmd = command.toLowerCase().trim();
+        updateMessage(`🎤 "${command}"`);
+        showStatus(`Processing: ${command}`);
+
+        if (cmd.startsWith('bet')) {
+            const amount = parseInt(cmd.replace('bet', '').trim());
+            if (isNaN(amount) || amount <= 0) {
+                speak("Invalid bet. Please bet a positive amount.");
+            } else if (amount > playerState.coins) {
+                speak(`You don't have enough coins. Your balance is ${playerState.coins} coins.`);
+            } else {
+                playerState.currentBet = amount;
+                speak(`Bet of ${amount} coins placed. Say 'new game' to start.`);
+                updateUI();
+            }
+        } else if (cmd.includes('new game')) {
+            if (playerState.currentBet === 0) {
+                speak("Please place a bet first by saying 'bet' followed by an amount.");
+                return;
+            }
+            game = new BlackjackGame();
+            game.startGame();
+        } else if (!game || !game.isGameActive) {
+            if (cmd === 'hit' || cmd === 'stand') {
+                speak("No active game. Place a bet and say 'new game' to begin.");
+            } else if (cmd.includes('my hand') || cmd.includes('dealer')) {
+                speak("No active game to check hands.");
+            } else {
+                speak("Command not recognized. Say 'bet [amount]' to start a new game.");
+            }
+        } else if (cmd === 'hit') {
+            game.hit();
+        } else if (cmd === 'stand') {
+            game.stand();
+        } else if (cmd.includes('my hand')) {
+            speak(game.describeHand(game.playerHand));
+        } else if (cmd.includes('dealer')) {
+            speak(game.describeDealerVisibleCard());
+        } else {
+            speak("Command not recognized. Say 'hit', 'stand', or ask about your hand.");
+        }
+      };
+
+      // Speech recognition setup
+      const startListening = () => {
+        if (!recognition) {
+          showStatus("Speech recognition not supported. Please use Chrome or Edge.", "error");
+          return;
+        }
+        
+        if (isListening) {
+          return; // Already listening
+        }
+        
+        try {
+          recognition.start();
+          isListening = true;
+          container.classList.add('listening');
+          clickPrompt.style.display = 'none';
+          showStatus("🎤 Listening for commands...");
+        } catch (error) {
+          console.log('Recognition start error:', error);
+          showStatus("Could not start voice recognition.", "error");
+          isListening = false;
+          container.classList.remove('listening');
+          clickPrompt.style.display = 'block';
+        }
+      };
+
+      if (recognition) {
+        recognition.continuous = false;
+        recognition.lang = 'en-US';
+        recognition.interimResults = false;
+
+        recognition.onresult = (event) => {
+          const transcript = event.results[0][0].transcript;
+          console.log('Voice input:', transcript);
+          handleCommand(transcript);
+        };
+
+        recognition.onerror = (event) => {
+          console.log('Recognition error:', event.error);
+          isListening = false;
+          container.classList.remove('listening');
+          let errorMessage = "Voice recognition error.";
+          if (event.error === 'not-allowed') {
+            errorMessage = "Microphone access required for voice commands.";
+          } else if (event.error === 'no-speech') {
+            errorMessage = "No speech detected. Try again.";
+          } else if (event.error === 'aborted') {
+            // Don't show error for aborted recognition
+            clickPrompt.style.display = 'block';
+            return;
+          }
+          showStatus(errorMessage, "error");
+          clickPrompt.style.display = 'block';
+        };
+
+        recognition.onend = () => {
+          console.log('Recognition ended');
+          isListening = false;
+          container.classList.remove('listening');
+          clickPrompt.style.display = 'block';
+          // Auto-restart listening if game is active and no error occurred
+          if (game && game.isGameActive && !recognition.error) {
+            setTimeout(() => {
+              if (game && game.isGameActive && !isListening) {
+                startListening();
+              }
+            }, 1000);
+          }
+        };
+      }
+
+      // Click handlers
+      clickPrompt.addEventListener('click', startListening);
+      container.addEventListener('click', (e) => {
+        if (e.target === clickPrompt) return;
+        if (!isListening && recognition) {
+          startListening();
+        }
+      });
+
+      // Initialize
+      updateUI();
+      
+      // Simulate network activity
+      setInterval(() => {
+        const players = 2800 + Math.floor(Math.random() * 100);
+        const txPerMin = 150 + Math.floor(Math.random() * 20);
+        document.getElementById('active-players').textContent = players.toLocaleString();
+        document.getElementById('tx-per-min').textContent = txPerMin;
+      }, 5000);
+
+      // Auto-generate praise feed entries
+      setInterval(() => {
+        if (Math.random() < 0.3) { // 30% chance every interval
+          const actions = [
+            "started a new ritual", "completed a successful wager", "achieved victory", 
+            "made a strategic stand", "trusted in the blockchain", "honored the ritual"
+          ];
+          const user = users[Math.floor(Math.random() * users.length)];
+          const action = actions[Math.floor(Math.random() * actions.length)];
+          const amount = Math.floor(Math.random() * 200) + 10;
+          addPraise(`${user} ${action} with ${amount} coins.`);
+        }
+      }, 8000);
+
+      // Welcome message
+      setTimeout(() => {
+        speak("Welcome to Blockchain Blackjack. A ritual of wager and luck. Your balance is 1000 coins. To begin a new ritual, say 'bet' and an amount.");
+      }, 1000);
+    });
+  </script>
+</body>
+</html>
